@@ -1,8 +1,9 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { useRoute } from "./router";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,20 +23,10 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
-
+  const routing = useRoute("khnbnm");
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      <Text>Open up App.js to start working on your App</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer onReady={onLayoutRootView}>
+      {routing}
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

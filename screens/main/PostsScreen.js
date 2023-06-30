@@ -1,43 +1,90 @@
-import { ImageBackground, StyleSheet, View, Text } from "react-native";
-import ContactImage from "../../assets/images/photo-girl.png";
+import { createStackNavigator } from "@react-navigation/stack";
+import { TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import DefaultPostsScreen from "../nestedScreens/DefaultPostsScreen";
+import CommentsScreen from "../nestedScreens/CommentsScreen";
+import MapScreen from "../nestedScreens/MapScreen";
+
+const NestedScreen = createStackNavigator();
 
 export default function PostsScreen() {
   return (
-    <View style={StyleSheet.container}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <ImageBackground
-          style={styles.contactImage}
-          source={ContactImage}
-        ></ImageBackground>
-        <View style={{ marginLeft: 8 }}>
-          <Text style={styles.textEmail}>{}</Text>
-        </View>
-      </View>
-    </View>
+    <NestedScreen.Navigator>
+      <NestedScreen.Screen
+        name="DefaultPosts"
+        component={DefaultPostsScreen}
+        options={{
+          headerTitle: "Публікації",
+          headerTitleAlign: "center",
+          headerStyle: {
+            height: 88,
+            backgroundColor: "#FFFFFF",
+            shadowColor: "rgba(0, 0, 0, 0.3)",
+            shadowOffset: { width: 0, height: 0.5 },
+            shadowRadius: 1.35914,
+          },
+          headerTitleStyle: {
+            fontFamily: "Roboto-Medium",
+            fontStyle: "normal",
+            fontSize: 17,
+            lineHeight: 22,
+            letterSpacing: -0.408,
+          },
+          headerTintColor: "#212121",
+          headerLeft: null,
+          headerRight: () => (
+            <TouchableOpacity style={{ marginRight: 10 }}>
+              <Feather name="log-out" size={24} color="#BDBDBD" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <NestedScreen.Screen
+        name="Comments"
+        component={CommentsScreen}
+        options={{
+          headerTitle: "Коментарі",
+          headerTitleAlign: "center",
+          headerStyle: {
+            height: 88,
+            backgroundColor: "#FFFFFF",
+            shadowColor: "rgba(0, 0, 0, 0.3)",
+            shadowOffset: { width: 0, height: 0.5 },
+            shadowRadius: 1.35914,
+          },
+          headerTitleStyle: {
+            fontFamily: "Roboto-Medium",
+            fontStyle: "normal",
+            fontSize: 17,
+            lineHeight: 22,
+            letterSpacing: -0.408,
+          },
+          headerTintColor: "#212121",
+        }}
+      />
+      <NestedScreen.Screen
+        name="Map"
+        component={MapScreen}
+        options={{
+          headerTitle: "Карта",
+          headerTitleAlign: "center",
+          headerStyle: {
+            height: 88,
+            backgroundColor: "#FFFFFF",
+            shadowColor: "rgba(0, 0, 0, 0.3)",
+            shadowOffset: { width: 0, height: 0.5 },
+            shadowRadius: 1.35914,
+          },
+          headerTitleStyle: {
+            fontFamily: "Roboto-Medium",
+            fontStyle: "normal",
+            fontSize: 17,
+            lineHeight: 22,
+            letterSpacing: -0.408,
+          },
+          headerTintColor: "#212121",
+        }}
+      />
+    </NestedScreen.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingTop: 32,
-    paddingBottom: 16,
-  },
-  contactImage: {
-    width: 60,
-    height: 60,
-  },
-  textName: {
-    fontFamily: "Roboto-Bold",
-    fontSize: 13,
-    lineHeight: 15,
-  },
-  textEmail: {
-    fontFamily: "Roboto-Regular",
-    fontSize: 11,
-    lineHeight: 13,
-    color: "rgba(33, 33, 33, 0.8)",
-  },
-});
