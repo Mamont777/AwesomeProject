@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import DefaultPostsScreen from "../nestedScreens/DefaultPostsScreen";
+import DefaultScreenPosts from "../nestedScreens/DefaultScreenPosts";
 import CommentsScreen from "../nestedScreens/CommentsScreen";
 import MapScreen from "../nestedScreens/MapScreen";
 
@@ -12,7 +12,7 @@ export default function PostsScreen() {
     <NestedScreen.Navigator>
       <NestedScreen.Screen
         name="DefaultPosts"
-        component={DefaultPostsScreen}
+        component={DefaultScreenPosts}
         options={{
           headerTitle: "Публікації",
           headerTitleAlign: "center",
