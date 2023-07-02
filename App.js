@@ -3,7 +3,9 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
 import { NavigationContainer } from "@react-navigation/native";
+import { Provider } from "react-redux";
 import { useRoute } from "./router";
+import { store } from "./redux/store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,10 +25,12 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
-  const routing = useRoute("khnbnm");
+  const routing = useRoute(false);
   return (
-    <NavigationContainer onReady={onLayoutRootView}>
-      {routing}
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer onReady={onLayoutRootView}>
+        {routing}
+      </NavigationContainer>
+    </Provider>
   );
 }

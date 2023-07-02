@@ -13,11 +13,11 @@ import {
   Dimensions,
   Image,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import BgImage from "../../assets/images/bg-img.jpg";
-import ContactImage from "../../assets/images/photo-girl.png";
-import AddContact from "../../assets/images/add.png";
-import AddedContact from "../../assets/images/added.png";
+import { authSignUpUser } from "../../redux/auth/authOperations";
 
 const initialState = {
   login: "",
@@ -27,20 +27,15 @@ const initialState = {
 
 export default function RegistrationScreen() {
   const [state, setState] = useState(initialState);
-  const [isShowKeyBoard, setIsShowKeyBoard] = useState(false);
+  const [isShowKeyBoard, setIsShowKeyboard] = useState(false);
   const [dimensions, setDimensions] = useState(
     Dimensions.get("window").width - 16 * 2
   );
   const [showPassword, setShowPassword] = useState(false);
-  const [showAddContact, setShowAddContact] = useState(true);
-  const [showAddedContact, setShowAddedContact] = useState(false);
+
+  const dispatch = useDispatch();
 
   const navigation = useNavigation();
-
-  const addImage = () => {
-    setShowAddContact(false);
-    setShowAddedContact(true);
-  };
 
   useEffect(() => {
     const onChange = () => {
@@ -53,23 +48,19 @@ export default function RegistrationScreen() {
   }, []);
 
   const showKeyboard = () => {
-    setIsShowKeyBoard(true);
+    setIsShowKeyboard(true);
   };
 
   const hideKeyboard = () => {
-    setIsShowKeyBoard(false);
+    setIsShowKeyboard(false);
     Keyboard.dismiss();
   };
 
   const { login, email, password } = state;
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     hideKeyboard();
-    navigation.navigate("Home", {
-      login,
-      email,
-      password,
-    });
+    dispatch(authSignUpUser(state));
     setState(initialState);
   };
 
@@ -81,28 +72,39 @@ export default function RegistrationScreen() {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
             <View style={styles.layout}>
-              {showAddContact ? (
-                <TouchableOpacity style={styles.buttonAdd} onPress={addImage}>
-                  <Image style={styles.buttonAddIcon} source={AddContact} />
-                </TouchableOpacity>
-              ) : (
-                <ImageBackground
-                  style={styles.contactImage}
-                  source={ContactImage}
-                  transform={[{ translateX: -60 }]}
-                >
-                  {showAddedContact && (
-                    <Image
-                      source={AddedContact}
-                      style={styles.addedContactIcon}
+              <View style={styles.avatar}>
+                <Image style={styles.avatarImage} />
+                {/* {!avatar ? (
+                  <TouchableOpacity
+                    style={styles.buttonAddAvatar}
+                    onPress={pickAvatar}
+                    activeOpacity={0.9}
+                  >
+                    <Ionicons
+                      name="add-circle-outline"
+                      size={20}
+                      color="#FF6C00"
                     />
-                  )}
-                </ImageBackground>
-              )}
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.buttonRemoveAvatar}
+                    activeOpacity={0.9}
+                    onPress={removeAvatar}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={20}
+                      color="#E8E8E8"
+                    />
+                  </TouchableOpacity>
+                )} */}
+              </View>
               <Text style={styles.title}>Реєстрація</Text>
 
               <View
                 style={{
+                  ...styles.form,
                   marginBottom: isShowKeyBoard ? 32 : 78,
                   width: dimensions,
                 }}
@@ -113,7 +115,7 @@ export default function RegistrationScreen() {
                     onFocus={showKeyboard}
                     style={styles.input}
                     placeholder="Логін"
-                    value={state.login}
+                    value={login}
                     onChangeText={(value) =>
                       setState((prevState) => ({ ...prevState, login: value }))
                     }
@@ -126,7 +128,7 @@ export default function RegistrationScreen() {
                     onFocus={showKeyboard}
                     style={styles.input}
                     placeholder="Адреса електронної пошти"
-                    value={state.email}
+                    value={email}
                     onChangeText={(value) =>
                       setState((prevState) => ({ ...prevState, email: value }))
                     }
@@ -141,7 +143,7 @@ export default function RegistrationScreen() {
                     style={styles.input}
                     placeholder="Пароль"
                     maxLength={20}
-                    value={state.password}
+                    value={password}
                     onChangeText={(value) =>
                       setState((prevState) => ({
                         ...prevState,
@@ -167,7 +169,9 @@ export default function RegistrationScreen() {
                   activeOpacity={0.8}
                   onPress={onSubmit}
                 >
-                  <Text style={styles.btnTitle}>Зареєстуватися</Text>
+                  <Text style={styles.btnTitle} onPress={onSubmit}>
+                    Зареєстуватися
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -206,41 +210,6 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     justifyContent: "flex-end",
   },
-  contactImage: {
-    position: "absolute",
-    top: -60,
-    left: "50%",
-    width: 120,
-    height: 120,
-  },
-  buttonAdd: {
-    position: "absolute",
-    top: -60,
-    left: "50%",
-    width: 120,
-    height: 120,
-  },
-  buttonAddIcon: {
-    position: "absolute",
-    top: -1,
-    left: -50,
-    width: 120,
-    height: 120,
-    borderRadius: 16,
-  },
-  addedContactIcon: {
-    position: "absolute",
-    top: 80,
-    right: 48,
-    width: 25,
-    height: 25,
-  },
-  placeholder: {
-    width: 120,
-    height: 120,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 8,
-  },
   layout: {
     marginTop: "auto",
     position: "relative",
@@ -248,6 +217,52 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     backgroundColor: "#fff",
     alignItems: "center",
+  },
+  avatar: {
+    position: "absolute",
+    backgroundColor: "#F6F6F6",
+    borderRadius: 16,
+    top: -60,
+    alignSelf: "center",
+    marginHorizontal: "auto",
+    width: 120,
+    height: 120,
+  },
+  avatarImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+  },
+  buttonAddAvatar: {
+    position: "absolute",
+    bottom: 14,
+    right: -12.5,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 25,
+    height: 25,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 50,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#FF6C00",
+  },
+  buttonRemoveAvatar: {
+    position: "absolute",
+    bottom: 14,
+    right: -12.5,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 25,
+    height: 25,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 50,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "#E8E8E8",
+  },
+  form: {
+    marginHorizontal: 16,
   },
 
   title: {

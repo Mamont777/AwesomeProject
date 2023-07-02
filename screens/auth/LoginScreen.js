@@ -13,7 +13,9 @@ import {
   Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
 import BgImage from "../../assets/images/bg-img.jpg";
+import { authSignInUser } from "../../redux/auth/authOperations";
 
 const initialState = {
   email: "",
@@ -22,12 +24,14 @@ const initialState = {
 
 export default function LoginScreen() {
   const [state, setState] = useState(initialState);
-  const [isShowKeyBoard, setIsShowKeyBoard] = useState(false);
+  const [isShowKeyBoard, setIsShowKeyboard] = useState(false);
   const [dimensions, setDimensions] = useState(
     Dimensions.get("window").width - 16 * 2
   );
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const onChange = () => {
@@ -40,11 +44,11 @@ export default function LoginScreen() {
   }, []);
 
   const showKeyboard = () => {
-    setIsShowKeyBoard(true);
+    setIsShowKeyboard(true);
   };
 
   const hideKeyboard = () => {
-    setIsShowKeyBoard(false);
+    setIsShowKeyboard(false);
     Keyboard.dismiss();
   };
 
@@ -52,10 +56,7 @@ export default function LoginScreen() {
 
   const onSubmit = () => {
     hideKeyboard();
-    navigation.navigate("Home", {
-      screen: "PostsScreen",
-      params: { email, password },
-    });
+    dispatch(authSignInUser(state));
     setState(initialState);
   };
 
@@ -75,13 +76,13 @@ export default function LoginScreen() {
                 width: dimensions,
               }}
             >
-              <View style={{ marginTop: 33 }}>
+              <View style={{ marginTop: 32 }}>
                 <TextInput
                   onBlur={hideKeyboard}
                   onFocus={showKeyboard}
                   style={styles.input}
                   placeholder="Адреса електроної пошти"
-                  value={state.email}
+                  value={email}
                   onChangeText={(value) =>
                     setState((prevState) => ({ ...prevState, email: value }))
                   }
@@ -95,7 +96,7 @@ export default function LoginScreen() {
                   onFocus={showKeyboard}
                   style={styles.input}
                   placeholder="Пароль"
-                  value={state.password}
+                  value={password}
                   onChangeText={(value) =>
                     setState((prevState) => ({ ...prevState, password: value }))
                   }
@@ -159,18 +160,6 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     justifyContent: "flex-end",
   },
-  input: {
-    position: "relative",
-    backgroundColor: "#F6F6F6",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#E8E8E8",
-    height: 50,
-    padding: 16,
-    marginBottom: 15,
-    color: "#212121",
-    fontFamily: "Roboto-Regular",
-  },
   layout: {
     marginTop: "auto",
     position: "relative",
@@ -188,6 +177,19 @@ const styles = StyleSheet.create({
     letterSpacing: 0.01,
     color: "#212121",
   },
+  input: {
+    position: "relative",
+    backgroundColor: "#F6F6F6",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E8E8E8",
+    height: 50,
+    padding: 16,
+    marginBottom: 15,
+    color: "#212121",
+    fontFamily: "Roboto-Regular",
+  },
+
   btn: {
     backgroundColor: "#FF6C00",
     height: 51,
@@ -209,7 +211,9 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     textDecorationLine: "underline",
   },
-  form: {},
+  form: {
+    marginHorizontal: 16,
+  },
   showPasswordContainer: {
     position: "absolute",
     top: 16,
