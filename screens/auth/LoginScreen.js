@@ -12,7 +12,6 @@ import {
   Dimensions,
   Keyboard,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import BgImage from "../../assets/images/bg-img.jpg";
 import { authSignInUser } from "../../redux/auth/authOperations";
@@ -22,14 +21,13 @@ const initialState = {
   password: "",
 };
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [state, setState] = useState(initialState);
   const [isShowKeyBoard, setIsShowKeyboard] = useState(false);
   const [dimensions, setDimensions] = useState(
     Dimensions.get("window").width - 16 * 2
   );
   const [showPassword, setShowPassword] = useState(false);
-  const navigation = useNavigation();
 
   const dispatch = useDispatch();
 

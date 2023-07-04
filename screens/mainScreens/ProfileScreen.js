@@ -1,7 +1,14 @@
 import { View, Text, StyleSheet, ImageBackground } from "react-native";
+import { useDispatch } from "react-redux";
 import BgImage from "../../assets/images/bg-img.jpg";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 
 export default function Profile() {
+  const dispatch = useDispatch();
+
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.bgImage} source={BgImage}>

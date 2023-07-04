@@ -12,6 +12,10 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useSelector } from "react-redux";
+import { addDoc, collection } from "firebase/firestore";
+import { db, storage } from "../../firebase/config";
 
 export default function CreatePosts({ navigation }) {
   const [cameraRef, setCameraRef] = useState(null);
@@ -20,6 +24,8 @@ export default function CreatePosts({ navigation }) {
   const [titlePhoto, setTitlePhoto] = useState("");
   const [location, setLocation] = useState(null);
   const [place, setPlace] = useState("");
+
+  const { userId, login, avatar } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -39,10 +45,10 @@ export default function CreatePosts({ navigation }) {
   }, []);
 
   const takePhoto = async () => {
-    let location = await Location.getCurrentPositionAsync({});
+    let locationData = await Location.getCurrentPositionAsync({});
     const coords = {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
+      latitude: locationData.coords.latitude,
+      longitude: locationData.coords.longitude,
     };
     setLocation(coords);
     const photo = await cameraRef.takePictureAsync();
@@ -51,7 +57,8 @@ export default function CreatePosts({ navigation }) {
   };
 
   const sendPhoto = async () => {
-    navigation.navigate("DefaultPosts", { photo });
+    uploadPostToServer();
+    navigation.navigate("DefaultPosts");
     setPhoto("");
     setTitlePhoto("");
     setLocation("");
@@ -71,6 +78,35 @@ export default function CreatePosts({ navigation }) {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
+
+  const uploadPostToServer = async () => {
+    const photo = await uploadPhotoToServer();
+    const createPost = Date.now();
+
+    await addDoc(collection(db, `posts`), {
+      photo,
+      titlePhoto,
+      location,
+      userId,
+      login,
+      avatar,
+      createPost,
+      likes: 0,
+    });
+  };
+
+  const uploadPhotoToServer = async () => {
+    const response = await fetch(photo);
+    const file = await response.blob();
+
+    const uniquePostId = Date.now().toString();
+
+    const imageRef = ref(storage, `postImage/${uniquePostId}`);
+    await uploadBytes(imageRef, file);
+
+    const processedPhoto = await getDownloadURL(imageRef);
+    return processedPhoto;
+  };
 
   return (
     <View style={styles.container}>

@@ -8,22 +8,35 @@ import {
   Text,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { onSnapshot, collection, query, orderBy } from "firebase/firestore";
+import { useSelector } from "react-redux";
+import { db } from "../../firebase/config";
 
-const DefaultScreenPosts = ({ route, navigation }) => {
+const DefaultScreenPosts = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
 
+  const { login, email, avatar } = useSelector((state) => state.auth);
+
+  const getAllPosts = async () => {
+    const postsQuery = query(
+      collection(db, "posts"),
+      orderBy("createPost", "desc")
+    );
+    onSnapshot(postsQuery, (data) =>
+      setPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+    );
+  };
+
   useEffect(() => {
-    if (route.params) {
-      setPosts((prevState) => [...prevState, route.params]);
-    }
-  }, [route.params]);
+    getAllPosts();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.userContainer}>
-        <Image style={styles.userImage} />
+        <Image style={styles.userImage} source={{ uri: avatar }} />
         <View>
-          <Text style={styles.userName}></Text>
+          <Text style={styles.userName}>{login}</Text>
           <Text
             style={{
               fontSize: 11,
@@ -31,12 +44,15 @@ const DefaultScreenPosts = ({ route, navigation }) => {
               color: "#212121",
               fontFamily: "Roboto-Regular",
             }}
-          ></Text>
+          >
+            {" "}
+            {email}
+          </Text>
         </View>
       </View>
       <FlatList
         data={posts}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View>
             <Image source={{ uri: item.photo }} style={styles.itemPhoto} />
@@ -51,6 +67,7 @@ const DefaultScreenPosts = ({ route, navigation }) => {
                       autorPostId: item.userId,
                     })
                   }
+                  accessibilityLabel="View comments"
                 >
                   <Feather
                     name="message-circle"
@@ -72,6 +89,7 @@ const DefaultScreenPosts = ({ route, navigation }) => {
                       image: item.photo,
                     });
                   }}
+                  accessibilityLabel="View location"
                 >
                   <Feather
                     name="map-pin"
@@ -127,7 +145,7 @@ const styles = StyleSheet.create({
   },
   itemPhoto: {
     width: "100%",
-    height: 240,
+    aspectRatio: 1,
     borderRadius: 8,
     marginBottom: 8,
   },
