@@ -15,9 +15,12 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import BgImage from "../../assets/images/bg-img.jpg";
 import { authSignUpUser } from "../../redux/auth/authOperations";
+import { storage } from "../../firebase/config";
 
 const initialState = {
   login: "",
@@ -32,6 +35,7 @@ export default function RegistrationScreen() {
     Dimensions.get("window").width - 16 * 2
   );
   const [showPassword, setShowPassword] = useState(false);
+  const [avatar, setAvatar] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -55,12 +59,47 @@ export default function RegistrationScreen() {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
   };
+  const pickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
 
-  const { login, email, password } = state;
+    if (!result.canceled) {
+      setAvatar(result.assets[0].uri);
+    }
+  };
+
+  const removeAvatar = () => {
+    setAvatar(null);
+  };
+
+  const uploadPhotoToServer = async () => {
+    let imageRef;
+
+    if (avatar) {
+      const response = await fetch(avatar);
+      const file = await response.blob();
+      const uniqueAvatarId = Date.now().toString();
+      imageRef = ref(storage, `userAvatars/${uniqueAvatarId}`);
+      await uploadBytes(imageRef, file);
+    }
+
+    const processedPhoto = await getDownloadURL(imageRef);
+    return processedPhoto;
+  };
 
   const onSubmit = async () => {
     hideKeyboard();
-    dispatch(authSignUpUser(state));
+    const photo = await uploadPhotoToServer();
+    dispatch(
+      authSignUpUser({
+        ...state,
+        avatar: photo,
+      })
+    );
     setState(initialState);
   };
 
@@ -73,8 +112,8 @@ export default function RegistrationScreen() {
           >
             <View style={styles.layout}>
               <View style={styles.avatar}>
-                <Image style={styles.avatarImage} />
-                {/* {!avatar ? (
+                <Image style={styles.avatarImage} source={{ uri: avatar }} />
+                {!avatar ? (
                   <TouchableOpacity
                     style={styles.buttonAddAvatar}
                     onPress={pickAvatar}
@@ -98,7 +137,7 @@ export default function RegistrationScreen() {
                       color="#E8E8E8"
                     />
                   </TouchableOpacity>
-                )} */}
+                )}
               </View>
               <Text style={styles.title}>Реєстрація</Text>
 
@@ -115,7 +154,7 @@ export default function RegistrationScreen() {
                     onFocus={showKeyboard}
                     style={styles.input}
                     placeholder="Логін"
-                    value={login}
+                    value={state.login}
                     onChangeText={(value) =>
                       setState((prevState) => ({ ...prevState, login: value }))
                     }
@@ -128,7 +167,7 @@ export default function RegistrationScreen() {
                     onFocus={showKeyboard}
                     style={styles.input}
                     placeholder="Адреса електронної пошти"
-                    value={email}
+                    value={state.email}
                     onChangeText={(value) =>
                       setState((prevState) => ({ ...prevState, email: value }))
                     }
@@ -143,7 +182,7 @@ export default function RegistrationScreen() {
                     style={styles.input}
                     placeholder="Пароль"
                     maxLength={20}
-                    value={password}
+                    value={state.password}
                     onChangeText={(value) =>
                       setState((prevState) => ({
                         ...prevState,
@@ -241,11 +280,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 25,
     height: 25,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 50,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "#FF6C00",
   },
   buttonRemoveAvatar: {
     position: "absolute",
@@ -255,11 +289,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 25,
     height: 25,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 50,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "#E8E8E8",
+    // backgroundColor: "#FFFFFF",
+    // borderRadius: 50,
+    // borderWidth: 1,
+    // borderStyle: "solid",
+    // borderColor: "#E8E8E8",
   },
   form: {
     marginHorizontal: 16,

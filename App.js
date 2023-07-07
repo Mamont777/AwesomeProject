@@ -3,8 +3,9 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback } from "react";
 import { Provider } from "react-redux";
-import { store } from "./redux/store";
+import { persistor, store } from "./redux/store";
 import Main from "./components/main";
+import { PersistGate } from "redux-persist/integration/react";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,7 +28,9 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <Main onLayoutRootView={onLayoutRootView} />
+      <PersistGate loading={null} persistor={persistor}>
+        <Main onLayoutRootView={onLayoutRootView} />
+      </PersistGate>
     </Provider>
   );
 }

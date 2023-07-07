@@ -45,14 +45,13 @@ const DefaultScreenPosts = ({ navigation }) => {
               fontFamily: "Roboto-Regular",
             }}
           >
-            {" "}
             {email}
           </Text>
         </View>
       </View>
       <FlatList
         data={posts}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <View>
             <Image source={{ uri: item.photo }} style={styles.itemPhoto} />

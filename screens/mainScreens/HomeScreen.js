@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import PostsScreen from "./PostsScreen";
 import CreatePostsScreen from "./CreatePostsScreen";
 import ProfileScreen from "./ProfileScreen";
@@ -9,7 +10,7 @@ import ProfileScreen from "./ProfileScreen";
 const BottomTabs = createBottomTabNavigator();
 
 export default function Home({ navigation }) {
-  const [isFocused, setIsFocuced] = useState(true);
+  const [isFocused, setIsFocused] = useState(true);
 
   return (
     <BottomTabs.Navigator
@@ -23,18 +24,19 @@ export default function Home({ navigation }) {
       <BottomTabs.Screen
         name="Posts"
         component={PostsScreen}
-        options={() => ({
+        options={({ route }) => ({
           headerShown: false,
-          tabBarStyle: () => {
-            const routeName = getFocusedNameRouteFromRoute() ?? "";
+          tabBarStyle: ((route) => {
+            const routeName = getFocusedRouteNameFromRoute(route) ?? "";
             if (routeName === "Comments" || routeName === "Map") {
               return { display: "none" };
             }
-          },
+            return;
+          })(route),
           tabBarIcon: () => (
             <TouchableOpacity
               onPress={() => {
-                setIsFocuced(true), navigation.navigate("Posts");
+                setIsFocused(true), navigation.navigate("Posts");
               }}
             >
               <View style={styles.iconNav}>
@@ -85,7 +87,7 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={{ marginLeft: 16 }}
               onPress={() => {
-                setIsFocuced(true), navigation.navigate("Posts");
+                setIsFocused(true), navigation.navigate("Posts");
               }}
             >
               <Feather
@@ -106,11 +108,11 @@ export default function Home({ navigation }) {
             <TouchableOpacity
               style={
                 !isFocused
-                  ? { ...styles.iconNav, backgroundColor: "#FF6C0" }
+                  ? { ...styles.iconNav, backgroundColor: "#FF6C00" }
                   : styles.iconNav
               }
               onPress={() => {
-                setIsFocuced(false), navigation.navigate("Profile");
+                setIsFocused(false), navigation.navigate("Profile");
               }}
             >
               <View>
