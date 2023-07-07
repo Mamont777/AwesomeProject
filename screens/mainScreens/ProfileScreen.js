@@ -1,4 +1,5 @@
 import {
+  FlatList,
   View,
   Text,
   StyleSheet,
@@ -29,7 +30,6 @@ import {
   updateUserAvatar,
 } from "../../redux/auth/authOperations";
 import { db, storage } from "../../firebase/config";
-import { FlatList } from "react-native";
 
 export default function Profile({ navigation }) {
   const [userPosts, setUserPosts] = useState([]);
@@ -54,29 +54,31 @@ export default function Profile({ navigation }) {
   const updateUserComments = async (avatar) => {
     const userQuery = query(
       collectionGroup(db, "comments"),
-      where("authorCommentId", "==", userId)
+      where("autorCommentId", "==", userId)
     );
 
     const querySnapshot = await getDocs(userQuery);
-
     querySnapshot.forEach((doc) => {
       updateDoc(doc.ref, { avatar });
     });
   };
 
   const uploadPhotoToServer = async (avatar) => {
+    let imageRef;
     if (avatar) {
       const response = await fetch(avatar);
       const file = await response.blob();
 
       const uniqueAvatarId = Date.now().toString();
 
-      const imageRef = ref(storage, `userAvatars/${uniqueAvatarId}`);
+      imageRef = ref(storage, `userAvatars/${uniqueAvatarId}`);
       await uploadBytes(imageRef, file);
-
-      const processedPhoto = await getDownloadURL(imageRef);
-      return processedPhoto;
+    } else {
+      imageRef = ref(storage, `userAvatars/default.png`);
     }
+
+    const processedPhoto = await getDownloadURL(imageRef);
+    return processedPhoto;
   };
 
   const pickAvatar = async () => {
@@ -97,7 +99,7 @@ export default function Profile({ navigation }) {
   };
 
   const removeAvatar = async () => {
-    const photo = uploadPhotoToServer();
+    const photo = await uploadPhotoToServer();
     await updateUserComments(photo);
     dispatch(updateUserAvatar(photo));
   };
@@ -132,15 +134,11 @@ export default function Profile({ navigation }) {
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                style={styles.removeAvatar}
+                style={styles.btnRemoveAvatar}
                 activeOpacity={0.9}
                 onPress={removeAvatar}
               >
-                <Ionicons
-                  name="close-circle-outline"
-                  size={20}
-                  color="#E8E8E8"
-                />
+                <Ionicons name="close" size={20} color="#E8E8E8" />
               </TouchableOpacity>
             )}
           </View>
@@ -157,7 +155,7 @@ export default function Profile({ navigation }) {
               <FlatList
                 style={{ marginBottom: 90 }}
                 data={userPosts}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <View>
                     <Image
@@ -292,7 +290,7 @@ const styles = StyleSheet.create({
   btnRemoveAvatar: {
     position: "absolute",
     bottom: 14,
-    right: 25,
+    right: -12.5,
     justifyContent: "center",
     alignItems: "center",
     width: 25,

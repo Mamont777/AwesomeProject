@@ -25,6 +25,7 @@ import {
 import { useSelector } from "react-redux";
 import { utcToZonedTime, format } from "date-fns-tz";
 import { uk } from "date-fns/locale";
+import { isValid } from "date-fns";
 import { Feather } from "@expo/vector-icons";
 import { db } from "../../firebase/config";
 
@@ -43,11 +44,11 @@ export default function CommentsScreen({ route }) {
 
   const createComment = async () => {
     const date = new Date();
-    const timezone = "Europe/Kiew";
+    const timezone = "Europe/Kiev";
     const localDate = utcToZonedTime(date, timezone);
-    const formattedDate = format(localDate, "d MMMM, yyyy | HH:mm", {
-      locale: uk,
-    });
+    const formattedDate = isValid(localDate)
+      ? format(localDate, "d MMMM, yyyy | HH:mm", { locale: uk })
+      : "";
 
     await addDoc(collection(db, "posts", postId, "comments"), {
       comment,
@@ -85,62 +86,64 @@ export default function CommentsScreen({ route }) {
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={hideKeyboard}>
-        <View style={{ marginBottom: 32 }}>
-          <Image style={styles.postPhoto} source={{ uri: postPhoto }} />
-        </View>
-        <FlatList
-          style={{ maxHeight: screenHeight * 0.35 }}
-          data={allComments}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <View
-              style={
-                autorPostId === item.autorCommentId
-                  ? styles.commentRevercedField
-                  : styles.commentField
-              }
-            >
+        <View>
+          <View style={{ marginBottom: 32 }}>
+            <Image style={styles.postPhoto} source={{ uri: postPhoto }} />
+          </View>
+          <FlatList
+            style={{ maxHeight: screenHeight * 0.35 }}
+            data={allComments}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
               <View
                 style={
                   autorPostId === item.autorCommentId
-                    ? { marginLeft: 16 }
-                    : { marginRight: 16 }
+                    ? styles.commentRevercedField
+                    : styles.commentField
                 }
               >
-                <Image
-                  source={{ uri: item.avatar }}
-                  style={styles.authorAvatar}
-                />
-              </View>
-              <View
-                style={
-                  autorPostId === item.autorCommentId
-                    ? { ...styles.commentWrapper, borderTopRightRadius: 0 }
-                    : { ...styles.commentWrapper, borderTopLeftRadius: 0 }
-                }
-              >
-                <Text
-                  style={styles.commentText}
-                  numberOfLines={3}
-                  ellipsizeMode="tail"
+                <View
+                  style={
+                    autorPostId === item.autorCommentId
+                      ? { marginLeft: 16 }
+                      : { marginRight: 16 }
+                  }
                 >
-                  {item.comment}
-                </Text>
-                <View>
+                  <Image
+                    source={{ uri: item.avatar }}
+                    style={styles.authorAvatar}
+                  />
+                </View>
+                <View
+                  style={
+                    autorPostId === item.autorCommentId
+                      ? { ...styles.commentWrapper, borderTopRightRadius: 0 }
+                      : { ...styles.commentWrapper, borderTopLeftRadius: 0 }
+                  }
+                >
                   <Text
-                    style={
-                      autorPostId === item.autorCommentId
-                        ? { ...styles.date, marginRight: "auto" }
-                        : { ...styles.date, marginLeft: "auto" }
-                    }
+                    style={styles.commentText}
+                    numberOfLines={3}
+                    ellipsizeMode="tail"
                   >
-                    {item.date}
+                    {item.comment}
                   </Text>
+                  <View>
+                    <Text
+                      style={
+                        autorPostId === item.autorCommentId
+                          ? { ...styles.date, marginRight: "auto" }
+                          : { ...styles.date, marginLeft: "auto" }
+                      }
+                    >
+                      {item.date}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
-        />
+            )}
+          />
+        </View>
       </TouchableWithoutFeedback>
       <KeyboardAvoidingView
         behavior={Platform.OS == "ios" ? "padding" : "height"}

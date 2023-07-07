@@ -11,6 +11,7 @@ import {
   authStateChange,
   updateUserProfile,
   updateAvatar,
+  authError,
 } from "./authReducer";
 
 export const authSignUpUser =

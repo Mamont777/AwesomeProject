@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import { addDoc, collection } from "firebase/firestore";
 import { db, storage } from "../../firebase/config";
 
-export default function CreatePosts({ navigation }) {
+const CreatePostsScreen = ({ navigation }) => {
   const [cameraRef, setCameraRef] = useState(null);
   const [photo, setPhoto] = useState("");
   const [hasPermission, setHasPermission] = useState(null);
@@ -157,7 +157,7 @@ export default function CreatePosts({ navigation }) {
         <TouchableOpacity
           style={
             photo
-              ? { ...styles.sendBtn, backgroundColor: "FF6C00" }
+              ? { ...styles.sendBtn, backgroundColor: "#FF6C00" }
               : styles.sendBtn
           }
           activeOpacity={0.8}
@@ -178,7 +178,7 @@ export default function CreatePosts({ navigation }) {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -260,3 +260,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default CreatePostsScreen;

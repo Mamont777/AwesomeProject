@@ -28,9 +28,18 @@ export const authSlice = createSlice({
       ...state,
       avatar: payload.avatar,
     }),
+    authError: (state, { payload }) => ({
+      ...state,
+      authError: payload.error,
+    }),
   },
 });
 
-export const { updateUserProfile, authStateChange, authSignOut, updateAvatar } =
-  authSlice.actions;
+export const {
+  updateUserProfile,
+  authStateChange,
+  authSignOut,
+  updateAvatar,
+  authError,
+} = authSlice.actions;
 export const authReducer = authSlice.reducer;

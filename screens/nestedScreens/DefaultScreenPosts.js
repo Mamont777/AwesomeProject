@@ -15,7 +15,7 @@ import { db } from "../../firebase/config";
 const DefaultScreenPosts = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
 
-  const { login, email, avatar } = useSelector((state) => state.auth);
+  const { login, email, avatar, userId } = useSelector((state) => state.auth);
 
   const getAllPosts = async () => {
     const postsQuery = query(
