@@ -17,19 +17,19 @@ const DefaultScreenPosts = ({ navigation }) => {
 
   const { login, email, avatar, userId } = useSelector((state) => state.auth);
 
+  useEffect(() => {
+    getAllPosts();
+  }, []);
+
   const getAllPosts = async () => {
     const postsQuery = query(
       collection(db, "posts"),
-      orderBy("createPost", "desc")
+      orderBy("createdDate", "desc")
     );
     onSnapshot(postsQuery, (data) =>
       setPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
     );
   };
-
-  useEffect(() => {
-    getAllPosts();
-  }, []);
 
   return (
     <View style={styles.container}>

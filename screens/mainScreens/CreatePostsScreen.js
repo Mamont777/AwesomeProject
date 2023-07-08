@@ -81,7 +81,7 @@ const CreatePostsScreen = ({ navigation }) => {
 
   const uploadPostToServer = async () => {
     const photo = await uploadPhotoToServer();
-    const createPost = Date.now();
+    const createdDate = Date.now();
 
     await addDoc(collection(db, `posts`), {
       photo,
@@ -90,7 +90,7 @@ const CreatePostsScreen = ({ navigation }) => {
       userId,
       login,
       avatar,
-      createPost,
+      createdDate,
       likes: 0,
     });
   };
