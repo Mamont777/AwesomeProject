@@ -12,6 +12,7 @@ import {
   collection,
   collectionGroup,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   orderBy,
@@ -108,16 +109,17 @@ export default function Profile({ navigation }) {
     dispatch(authSignOutUser());
   };
 
-  const updateLikes = async (itemId, likes) => {
+  const updateLikes = async (likes, itemId) => {
     try {
       const likeRef = doc(db, "posts", itemId);
       await updateDoc(likeRef, {
         likes: likes,
       });
     } catch (error) {
-      console.log(error.message);
+      console.log("err", error.message);
     }
   };
+
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.bgImage} source={BgImage}>
