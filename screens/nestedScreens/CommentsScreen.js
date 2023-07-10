@@ -15,7 +15,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   View,
-  Dimensions,
+  //   Dimensions,
   KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
@@ -36,7 +36,7 @@ export default function CommentsScreen({ route }) {
 
   const { userId, login, avatar } = useSelector((state) => state.auth);
 
-  const screenHeight = Dimensions.get("window").height;
+  //   const screenHeight = Dimensions.get("window").height;
 
   useEffect(() => {
     getAllComments();
@@ -91,7 +91,7 @@ export default function CommentsScreen({ route }) {
             <Image style={styles.postPhoto} source={{ uri: postPhoto }} />
           </View>
           <FlatList
-            style={{ maxHeight: screenHeight * 0.35 }}
+            style={{ height: "100%" }}
             data={allComments}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
@@ -177,9 +177,10 @@ const styles = StyleSheet.create({
   },
   postPhoto: {
     width: "100%",
-    aspectRatio: 1,
+    height: 240,
     borderRadius: 8,
   },
+
   commentField: {
     flexDirection: "row",
     marginBottom: 24,
