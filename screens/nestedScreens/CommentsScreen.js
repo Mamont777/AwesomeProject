@@ -15,7 +15,6 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   View,
-  //   Dimensions,
   KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
@@ -35,8 +34,6 @@ export default function CommentsScreen({ route }) {
   const [allComments, setAllComments] = useState([]);
 
   const { userId, login, avatar } = useSelector((state) => state.auth);
-
-  //   const screenHeight = Dimensions.get("window").height;
 
   useEffect(() => {
     getAllComments();
